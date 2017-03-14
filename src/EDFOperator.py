@@ -334,6 +334,7 @@ class EDFOperator( Operator ):
 						ptt.append(type(i))
 
 			ptd = zip(ptd,ptt)
+			
 			self.parameter_type_dictionary = np.dtype(ptd)
 		else: # we have to take the parameters from the output_dict pickle file of the same name as the edf file. 
 			self.logger.info('no parameter information in edf file')
