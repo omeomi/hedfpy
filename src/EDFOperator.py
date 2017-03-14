@@ -197,7 +197,7 @@ class EDFOperator( Operator ):
 		start_re = 'MSG\t([\d\.]+)\ttrial (\d+) started at (\d+.\d)', 
 		stop_re = 'MSG\t([\d\.]+)\ttrial (\d+) stopped at (\d+.\d)', 
 		phase_re = 'MSG\t([\d\.]+)\ttrial X phase (\d+) started at (\d+.\d)',
-		parameter_re = 'MSG\t[\d\.]+\ttrial X parameter[\t ]*(\S*?)\s+: ([-\d\.]*|[\w]*)'):
+		parameter_re = 'MSG\t[\d\.]+\ttrial X parameter[\t ]*(\S*?)\s+: ([-\d\.a-zA-Z]*|[\w]*)'):
 		
 		"""
 		read_trials reads in trials from the message file,
@@ -243,7 +243,7 @@ class EDFOperator( Operator ):
 			#
 			# trial phases 
 			#
-			shell()
+	
 			self.trial_phases = []
 			# for i in range(self.nr_trials):
 			for i in range(int(self.trial_starts[:,1].min()), 1+int(self.trial_starts[:,1].max())):
@@ -269,7 +269,10 @@ class EDFOperator( Operator ):
 		
 		self.message_string = self.message_string.replace(' [','').replace('.]','')
 		
+		#parameter_re = 'MSG\t[\d\.]+\ttrial X parameter[\t ]*(\S*?)\s+: ([-\d\.a-zA-Z]*|[\w]*)'
+
 		parameters = []
+
 		# for i in range(self.nr_trials):
 		for i in range(int(self.trial_starts[:,1].min()), 1+int(self.trial_starts[:,1].max())):
 			this_re = parameter_re.replace(' X ', ' ' + str(i) + ' ')
@@ -302,11 +305,17 @@ class EDFOperator( Operator ):
 				else:
 					if len(parameter_strings) > 0:
 						# assuming all these parameters are numeric
+						# mb: added a catch&convert if this is not true
 						this_trial_parameters = {'trial_nr': float(i)}
 						for s in parameter_strings:
 							try:
 								this_trial_parameters.update({s[0]: float(s[1])})
 							except ValueError:
+
+								if len(s[1])==1: # if it is a single character just convert to ASCII
+									this_trial_parameters.update({s[0]: float(ord(s[1]))})
+								else: # we have a longer string
+									this_trial_parameters.update({s[0]: s[1]})
 								pass
 						parameters.append(this_trial_parameters)
 			except:
@@ -315,7 +324,16 @@ class EDFOperator( Operator ):
 		if len(parameters) > 0:		# there were parameters in the edf file
 			self.parameters = parameters
 			print([k.keys() for k in self.parameters])
-			ptd = [(k, np.float64) for k in set(self.parameters[0].keys())]
+			# ptd = [(k, np.float64) for k in set(self.parameters[0].keys())]
+			ptd = []
+			ptt = []
+			for pii in range(len(parameters)):
+				for (k,i) in set(self.parameters[pii].items()):
+					if k not in ptd:
+						ptd.append(k)
+						ptt.append(type(i))
+
+			ptd = zip(ptd,ptt)
 			self.parameter_type_dictionary = np.dtype(ptd)
 		else: # we have to take the parameters from the output_dict pickle file of the same name as the edf file. 
 			self.logger.info('no parameter information in edf file')
