@@ -243,8 +243,10 @@ class EDFOperator( Operator ):
 			#
 			# trial phases 
 			#
+			shell()
 			self.trial_phases = []
-			for i in range(self.nr_trials):
+			# for i in range(self.nr_trials):
+			for i in range(int(self.trial_starts[:,1].min()), 1+int(self.trial_starts[:,1].max())):
 				this_trial_re = phase_re.replace(' X ', ' ' + str(i) + ' ')
 				phase_strings = re.findall(re.compile(this_trial_re), self.message_string)
 				self.trial_phases.append([[int(i), float(s[0]), int(s[1]), float(s[2])] for s in phase_strings])
@@ -268,7 +270,8 @@ class EDFOperator( Operator ):
 		self.message_string = self.message_string.replace(' [','').replace('.]','')
 		
 		parameters = []
-		for i in range(self.nr_trials):
+		# for i in range(self.nr_trials):
+		for i in range(int(self.trial_starts[:,1].min()), 1+int(self.trial_starts[:,1].max())):
 			this_re = parameter_re.replace(' X ', ' ' + str(i) + ' ')
 			parameter_strings = re.findall(re.compile(this_re), self.message_string)
 			
@@ -328,7 +331,8 @@ class EDFOperator( Operator ):
 		
 		events = []
 		this_length = 0
-		for i in range(self.nr_trials):
+		# for i in range(self.nr_trials):
+		for i in range(int(self.trial_starts[:,1].min()), 1+int(self.trial_starts[:,1].max())):
 			this_key_re = key_re.replace(' X ', ' ' + str(i) + ' ')
 			event_strings = re.findall(re.compile(this_key_re), self.message_string)
 			if len(event_strings) > 0:
