@@ -74,7 +74,10 @@ class HDFEyeOperator(Operator):
 		if filename == []:
 			filename = self.edf_operator.input_file_name
 			
-		this_table = self.h5f.create_table(run_group, name, type_dict, '%s in file %s' % (name, self.edf_operator.input_file_name))
+		try:
+			this_table = self.h5f.create_table(run_group, name, type_dict, '%s in file %s' % (name, self.edf_operator.input_file_name))
+		except:
+			shell()
 		
 		row = this_table.row
 		for r in data:

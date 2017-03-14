@@ -272,7 +272,7 @@ class EDFOperator( Operator ):
 		#parameter_re = 'MSG\t[\d\.]+\ttrial X parameter[\t ]*(\S*?)\s+: ([-\d\.a-zA-Z]*|[\w]*)'
 
 		parameters = []
-
+		ptypes = []
 		# for i in range(self.nr_trials):
 		for i in range(int(self.trial_starts[:,1].min()), 1+int(self.trial_starts[:,1].max())):
 			this_re = parameter_re.replace(' X ', ' ' + str(i) + ' ')
@@ -307,34 +307,29 @@ class EDFOperator( Operator ):
 						# assuming all these parameters are numeric
 						# mb: added a catch&convert if this is not true
 						this_trial_parameters = {'trial_nr': float(i)}
+						this_ptypes = [('trial_nr',np.float64)]
 						for s in parameter_strings:
-							try:
+							try:	# First try to process parameter as float
 								this_trial_parameters.update({s[0]: float(s[1])})
-							except ValueError:
+								this_ptypes.append((s[0],np.float64))
+							except ValueError: # If not then assume its a character or string
 
 								if len(s[1])==1: # if it is a single character just convert to ASCII
 									this_trial_parameters.update({s[0]: float(ord(s[1]))})
+									this_ptypes.append((s[0],'S1'))
 								else: # we have a longer string
 									this_trial_parameters.update({s[0]: s[1]})
+									this_ptypes.append((s[0],'S10'))
 								pass
 						parameters.append(this_trial_parameters)
+						ptypes.append(this_ptypes)
 			except:
 				pass
 		
 		if len(parameters) > 0:		# there were parameters in the edf file
 			self.parameters = parameters
 			print([k.keys() for k in self.parameters])
-			# ptd = [(k, np.float64) for k in set(self.parameters[0].keys())]
-			ptd = []
-			ptt = []
-			for pii in range(len(parameters)):
-				for (k,i) in set(self.parameters[pii].items()):
-					if k not in ptd:
-						ptd.append(k)
-						ptt.append(type(i))
-
-			ptd = zip(ptd,ptt)
-			
+			ptd = list(set([item for sublist in ptypes for item in sublist]))
 			self.parameter_type_dictionary = np.dtype(ptd)
 		else: # we have to take the parameters from the output_dict pickle file of the same name as the edf file. 
 			self.logger.info('no parameter information in edf file')
