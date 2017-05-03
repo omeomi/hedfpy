@@ -99,7 +99,7 @@ class EDFOperator( Operator ):
 		self.logger.info(self.header)
 		
 	
-	def identify_blocks(self, minimal_time_gap = 50.0, minimal_block_duration = 30e3):
+	def identify_blocks(self, minimal_time_gap = 50.0, minimal_block_duration = 30e3, maximal_block_duration = 1500000):
 		"""
 		identify separate recording blocks in eyelink file, where 'blocks' means periods between
 		startrecording and stoprecording
@@ -141,6 +141,7 @@ class EDFOperator( Operator ):
 		selected_block_indices = []
 		for i, b in enumerate(self.blocks):
 			minimal_block_duration_samples = minimal_block_duration * b['sample_rate'] / 1000.0
+			maximal_block_duration_samples = maximal_block_duration * b['sample_rate'] / 1000.0
 			self.logger.info('%f raw block duration, threshold %f' % (b['block_end_timestamp'] - b['block_start_timestamp'], minimal_block_duration_samples))
 			if (b['block_end_timestamp'] - b['block_start_timestamp']) > minimal_block_duration_samples:
 				selected_block_indices.append(i)
