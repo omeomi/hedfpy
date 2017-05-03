@@ -316,7 +316,8 @@ class EDFOperator( Operator ):
 							except ValueError: # If not then assume its a character or string
 
 								if len(s[1])==1: # if it is a single character just convert to ASCII
-									this_trial_parameters.update({s[0]: float(ord(s[1]))})
+									#this_trial_parameters.update({s[0]: float(ord(s[1]))})
+									this_trial_parameters.update({s[0]: s[1]})
 									this_ptypes.append((s[0],'S1'))
 								else: # we have a longer string
 									this_trial_parameters.update({s[0]: s[1]})
