@@ -332,7 +332,10 @@ class EDFOperator( Operator ):
 			self.parameters = parameters
 			print([k.keys() for k in self.parameters])
 			ptd = list(set([item for sublist in ptypes for item in sublist]))
-			self.parameter_type_dictionary = np.dtype(ptd)
+			try:
+				self.parameter_type_dictionary = np.dtype(ptd)
+			except:
+				shell()
 		else: # we have to take the parameters from the output_dict pickle file of the same name as the edf file. 
 			self.logger.info('no parameter information in edf file')
 			
