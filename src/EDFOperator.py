@@ -278,6 +278,7 @@ class EDFOperator( Operator ):
 		for i in range(int(self.trial_starts[:,1].min()), 1+int(self.trial_starts[:,1].max())):
 			this_re = parameter_re.replace(' X ', ' ' + str(i) + ' ')
 			parameter_strings = re.findall(re.compile(this_re), self.message_string)
+			# print(parameter_strings)
 			
 			# check if double params:
 			param_names = np.array([p[0] for p in parameter_strings])
@@ -286,7 +287,7 @@ class EDFOperator( Operator ):
 				
 				# we have double trials -- custom procedure!:
 				if nr_double_trials > 1:
-					shell()
+					# shell()
 					nr_params = len(param_names) / nr_double_trials
 					nr_param = 0
 					parameter_strings2 = []
@@ -321,8 +322,14 @@ class EDFOperator( Operator ):
 								# 	this_trial_parameters.update({s[0]: s[1]})
 								# 	this_ptypes.append((s[0],'S1'))
 								# else: # we have a longer string
-								this_trial_parameters.update({s[0]: s[1]})
-								this_ptypes.append((s[0],'S10'))
+								
+								# Due to stupid bug
+								if s[1]=='':
+									this_trial_parameters.update({s[0]: float(0)})
+									this_ptypes.append((s[0], np.float64))
+								else:
+									this_trial_parameters.update({s[0]: s[1]})
+									this_ptypes.append((s[0],'S10'))
 								# pass
 						parameters.append(this_trial_parameters)
 						ptypes.append(this_ptypes)
@@ -333,10 +340,9 @@ class EDFOperator( Operator ):
 			self.parameters = parameters
 			print([k.keys() for k in self.parameters])
 			ptd = list(set([item for sublist in ptypes for item in sublist]))
-			try:
-				self.parameter_type_dictionary = np.dtype(ptd)
-			except:
-				shell()
+
+			self.parameter_type_dictionary = np.dtype(ptd)
+
 		else: # we have to take the parameters from the output_dict pickle file of the same name as the edf file. 
 			self.logger.info('no parameter information in edf file')
 			
