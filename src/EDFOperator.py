@@ -283,9 +283,10 @@ class EDFOperator( Operator ):
 			param_names = np.array([p[0] for p in parameter_strings])
 			try:
 				nr_double_trials = sum(param_names == param_names[0])
-			
+				
 				# we have double trials -- custom procedure!:
 				if nr_double_trials > 1:
+					shell()
 					nr_params = len(param_names) / nr_double_trials
 					nr_param = 0
 					parameter_strings2 = []
@@ -315,14 +316,14 @@ class EDFOperator( Operator ):
 								this_ptypes.append((s[0],np.float64))
 							except ValueError: # If not then assume its a character or string
 
-								if len(s[1])==1: # if it is a single character just convert to ASCII
-									#this_trial_parameters.update({s[0]: float(ord(s[1]))})
-									this_trial_parameters.update({s[0]: s[1]})
-									this_ptypes.append((s[0],'S1'))
-								else: # we have a longer string
-									this_trial_parameters.update({s[0]: s[1]})
-									this_ptypes.append((s[0],'S10'))
-								pass
+								# if len(s[1])==1: # if it is a single character just convert to ASCII
+								# 	#this_trial_parameters.update({s[0]: float(ord(s[1]))})
+								# 	this_trial_parameters.update({s[0]: s[1]})
+								# 	this_ptypes.append((s[0],'S1'))
+								# else: # we have a longer string
+								this_trial_parameters.update({s[0]: s[1]})
+								this_ptypes.append((s[0],'S10'))
+								# pass
 						parameters.append(this_trial_parameters)
 						ptypes.append(this_ptypes)
 			except:
