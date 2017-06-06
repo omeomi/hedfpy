@@ -403,8 +403,11 @@ class EyeSignalOperator(Operator):
 		
 		# blinks to work with -- preferably eyelink!
 		if hasattr(self, 'eyelink_blink_data'):
-			for i in range(len(self.blink_starts_EL)):
-				self.raw_pupil[self.blink_starts_EL[i]:self.blink_ends_EL[i]] = 0 # set all eyelink-identified blinks to 0:
+			try:
+				for i in range(len(self.blink_starts_EL)):
+					self.raw_pupil[self.blink_starts_EL[i]:self.blink_ends_EL[i]] = 0 # set all eyelink-identified blinks to 0:
+			except:
+				shell()
 		else:
 			self.blinks_indices = pd.rolling_mean(np.array(self.raw_pupil == 0, dtype = float), int(coalesce_period)) > 0
 			self.blinks_indices = np.array(self.blinks_indices, dtype=int)
