@@ -15,8 +15,8 @@ import scipy as sp
 import numpy as np
 import matplotlib.pylab as pl
 
-from Operator import *
-from log import *
+from .Operator import *
+from .log import *
 
 from IPython import embed as shell
 

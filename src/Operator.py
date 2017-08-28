@@ -10,12 +10,12 @@ Copyright (c) 2010 __MyCompanyName__. All rights reserved.
 import tempfile, logging
 
 # from nibabel import *
-from log import *
+from .log import *
 
 class Operator( object ):
 	def __init__(self, input_object, **kwargs):
 		self.input_object = input_object
-		for k,v in kwargs.items():
+		for k,v in list(kwargs.items()):
 			setattr(self, k, v)
 			
 		# setup logging for this operator.

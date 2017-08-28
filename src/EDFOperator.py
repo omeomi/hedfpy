@@ -19,8 +19,8 @@ import scipy as sp
 
 from itertools import chain
 
-from CommandLineOperator import EDF2ASCOperator
-from Operator import Operator
+from .CommandLineOperator import EDF2ASCOperator
+from .Operator import Operator
 
 from IPython import embed as shell
 
@@ -92,7 +92,7 @@ class EDFOperator( Operator ):
 		self.logger.info('reading session information from %s'%self.message_file)
 		
 		with open(self.message_file, 'r') as mfd:
-			self.header = ''.join([mfd.next() for x in xrange(10)])
+			self.header = ''.join([next(mfd) for x in range(10)])
 		date_string = ' '.join([h for h in self.header.split('\n')[1].split(' ') if h not in ('', '**', 'DATE:')][1:])
 		self.recording_datetime = datetime.strptime(date_string, "%b %d %H:%M:%S %Y") # %a 
 		
@@ -338,7 +338,7 @@ class EDFOperator( Operator ):
 		
 		if len(parameters) > 0:		# there were parameters in the edf file
 			self.parameters = parameters
-			print([k.keys() for k in self.parameters])
+			print([list(k.keys()) for k in self.parameters])
 			ptd = list(set([item for sublist in ptypes for item in sublist]))
 
 			self.parameter_type_dictionary = np.dtype(ptd)
@@ -405,10 +405,10 @@ class EDFOperator( Operator ):
 			self.fixations_from_message_file = [{'eye':e[0],'start_timestamp':float(e[1]),'end_timestamp':float(e[2]),'duration':float(e[3]),'x':float(e[4]),'y':float(e[5]),'pupil_size':float(e[6])} for e in fix_strings]
 			self.blinks_from_message_file = [{'eye':e[0],'start_timestamp':float(e[1]),'end_timestamp':float(e[2]),'duration':float(e[3])} for e in blink_strings]
 		
-			self.saccade_type_dictionary = np.dtype([(s , np.array(self.saccades_from_message_file[0][s]).dtype) for s in self.saccades_from_message_file[0].keys()])
-			self.fixation_type_dictionary = np.dtype([(s , np.array(self.fixations_from_message_file[0][s]).dtype) for s in self.fixations_from_message_file[0].keys()])
+			self.saccade_type_dictionary = np.dtype([(s , np.array(self.saccades_from_message_file[0][s]).dtype) for s in list(self.saccades_from_message_file[0].keys())])
+			self.fixation_type_dictionary = np.dtype([(s , np.array(self.fixations_from_message_file[0][s]).dtype) for s in list(self.fixations_from_message_file[0].keys())])
 			if len(self.blinks_from_message_file) > 0:
-				self.blink_type_dictionary = np.dtype([(s , np.array(self.blinks_from_message_file[0][s]).dtype) for s in self.blinks_from_message_file[0].keys()])
+				self.blink_type_dictionary = np.dtype([(s , np.array(self.blinks_from_message_file[0][s]).dtype) for s in list(self.blinks_from_message_file[0].keys())])
 	
 	def read_sound_events(self, 
 		sound_re = 'MSG\t([\d\.]+)\treward (\d+) at (\d+.\d)'):

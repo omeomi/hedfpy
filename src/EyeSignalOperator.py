@@ -25,7 +25,7 @@ import scipy.stats as stats
 import mne
 from lmfit import minimize, Parameters, Parameter, report_fit
 
-from Operator import Operator
+from .Operator import Operator
 
 import fir
 

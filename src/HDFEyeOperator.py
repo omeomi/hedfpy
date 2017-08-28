@@ -11,9 +11,9 @@ import scipy as sp
 from tables import *
 import pandas as pd
 
-from EDFOperator import EDFOperator
-from Operator import Operator
-from EyeSignalOperator import EyeSignalOperator, detect_saccade_from_data
+from .EDFOperator import EDFOperator
+from .Operator import Operator
+from .EyeSignalOperator import EyeSignalOperator, detect_saccade_from_data
 
 from IPython import embed as shell 
 
@@ -78,7 +78,7 @@ class HDFEyeOperator(Operator):
 		
 		row = this_table.row
 		for r in data:
-			for par in r.keys():
+			for par in list(r.keys()):
 				row[par] = r[par]
 			row.append()
 		this_table.flush()
@@ -201,11 +201,11 @@ class HDFEyeOperator(Operator):
 		with pd.get_store(self.input_object) as h5_file:
 			# shell()
 			# recreate the non-gaze data for the block, that is, its sampling rate, eye of origin etc.
-			blocks_data_frame = pd.DataFrame([dict([[i,self.edf_operator.blocks[j][i]] for i in self.edf_operator.blocks[0].keys() if i not in ('block_data', 'data_columns')]) for j in range(len(self.edf_operator.blocks))])
+			blocks_data_frame = pd.DataFrame([dict([[i,self.edf_operator.blocks[j][i]] for i in list(self.edf_operator.blocks[0].keys()) if i not in ('block_data', 'data_columns')]) for j in range(len(self.edf_operator.blocks))])
 			h5_file.put("/%s/blocks"%alias, blocks_data_frame)
 			
 			# gaze data per block
-			if not 'block_data' in self.edf_operator.blocks[0].keys():
+			if not 'block_data' in list(self.edf_operator.blocks[0].keys()):
 				self.edf_operator.take_gaze_data_for_blocks()
 			for i, block in enumerate(self.edf_operator.blocks):
 				bdf = pd.DataFrame(block['block_data'], columns = block['data_columns'])
@@ -302,7 +302,7 @@ class HDFEyeOperator(Operator):
 								tf_decomposition=tf_decomposition_filterbank,
 								)
 						self.logger.info('Performed T-F analysis of type %s'%tf_decomposition_filterbank)
-						for freq in eso.band_pass_filter_bank_pupil.keys():
+						for freq in list(eso.band_pass_filter_bank_pupil.keys()):
 							bdf[eye+'_pupil_filterbank_bp_%2.5f'%freq] = eso.band_pass_filter_bank_pupil[freq]
 							self.logger.info('Saved T-F analysis %2.5f'%freq)
 					except:
@@ -333,9 +333,9 @@ class HDFEyeOperator(Operator):
 			period_block_nr = self.sample_in_block(sample = time_period[0], block_table = h5_file['%s/blocks'%alias]) 
 			table = h5_file['%s/block_%i'%(alias, period_block_nr)]
 			if columns == None:
-				columns = table.keys()
+				columns = list(table.keys())
 		if 'L_vel' in columns:
-			columns = table.keys()
+			columns = list(table.keys())
 		return table[(table['time'] > float(time_period[0])) & (table['time'] < float(time_period[1]))][columns]
 	
 	def eye_during_period(self, time_period, alias):
